@@ -1,6 +1,7 @@
 #include <iostream>
+#include "SWAlignment.h"
 
 int main() {
-    std::cout << "Hello World";
+    SWAlignment align = SWAlignment();
     return 0;
 }

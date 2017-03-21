@@ -11,9 +11,11 @@ template<typename T>
 class Matrix {
 protected:
     std::vector<T> data;
-    std::size_t numRows, numColumns;
 public:
+    std::size_t numRows, numColumns;
+
     Matrix() : numRows(0), numColumns(0) {}
+
     Matrix(std::size_t numRows, std::size_t numColumns) : numRows(numRows), numColumns(numColumns) {
         this->data = std::vector<T>(numRows * numColumns, 0);
     }

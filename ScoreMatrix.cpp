@@ -2,10 +2,10 @@
 // Created by nokados on 21.03.17.
 //
 
-#include "scoreMatrix.h"
+#include "ScoreMatrix.h"
 #include <set>
 
-scoreMatrix::scoreMatrix(std::string text) : Matrix() {
+ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
     std::set<char> chars;
     chars.insert(text.begin(), text.end());
     this->alphabet = std::vector<char>(chars.begin(), chars.end());
@@ -16,7 +16,7 @@ scoreMatrix::scoreMatrix(std::string text) : Matrix() {
     }
 }
 
-int scoreMatrix::get(char first, char second) {
+int ScoreMatrix::get(char first, char second) {
     size_t firstIndex = this->alphabetIndexes[first];
     size_t secondIndex = this->alphabetIndexes[second];
     return Matrix::get(firstIndex, secondIndex);

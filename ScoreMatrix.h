@@ -11,12 +11,12 @@
 
 #include "Matrix.h"
 
-class scoreMatrix : public Matrix<int> {
+class ScoreMatrix : public Matrix<int> {
 private:
     std::vector<char> alphabet;
     std::map<char, std::size_t> alphabetIndexes;
 public:
-    scoreMatrix(std::string text);
+    ScoreMatrix(std::string text);
     int get(char first, char second);
 };
 

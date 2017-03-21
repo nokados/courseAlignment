@@ -2,7 +2,7 @@
 #include "SWAlignment.h"
 #include "ScoreMatrix.h"
 
-int main() {
+int main(int argc, char** argv) {
     SWAlignment align = SWAlignment();
     ScoreMatrix score("lolo");
 

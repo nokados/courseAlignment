@@ -4,13 +4,11 @@
 
 #include "SWAlignment.h"
 #include <iostream>
-#include <algorithm>
 
-SWAlignment::SWAlignment(ScoreMatrix score, float gapInit, float gapContinue) : score(score), gapInit(gapInit),
-                                                                                gapContinue(gapContinue) {
+SWAlignment::SWAlignment(ScoreMatrix score, float gap) : score(score), gap(gap) {
 }
 
-std::map<char, char>
+std::pair<std::string, std::string>
 SWAlignment::align(std::string firstSeq, std::string secondSeq) {
     this->seq1 = firstSeq;
     this->seq2 = secondSeq;
@@ -19,17 +17,18 @@ SWAlignment::align(std::string firstSeq, std::string secondSeq) {
 
     this->_createSWArray();
     this->_forwardPropagation();
-
-    return std::map<char, char>();
+    return this->_backPropagation();
 }
 
 void SWAlignment::_createSWArray() {
-    this->SWArray.resize(this->len1 + 1, this->len2 + 1);
-    this->topValues.resize(this->len1 + 1, this->len2 + 1);
-    this->leftValues.resize(this->len1 + 1, this->len2 + 1);
+    this->SWArray.resize(this->len1 + 1, this->len2 + 1, 0);
+    this->directions.resize(this->len1 + 1, this->len2 + 1, Directions::NONE);
 }
 
 void SWAlignment::_forwardPropagation() {
+    this->maxValue = 0;
+    this->maxCoords.first = 0;
+    this->maxCoords.second = 0;
     for (size_t row = 1; row <= this->len1; row++) {
         for (size_t column = 1; column <= this->len2; column++) {
             this->_updateCellValue(row, column);
@@ -38,18 +37,67 @@ void SWAlignment::_forwardPropagation() {
 }
 
 void SWAlignment::_updateCellValue(size_t row, size_t column) {
-    float topValue = std::max((float) 0, this->topValues.get(row - 1, column) - this->gapContinue);
-    topValue = std::max(topValue, this->SWArray.get(row - 1, column) - this->gapInit);
-    this->topValues.set(row, column, topValue);
+    float topValue = this->SWArray.get(row - 1, column) - this->gap;
+    float leftValue = this->SWArray.get(row, column - 1) - this->gap;
 
-    float leftValue = std::max((float) 0, this->leftValues.get(row, column - 1) - this->gapContinue);
-    leftValue = std::max(leftValue, this->SWArray.get(row, column - 1) - this->gapInit);
-    this->leftValues.set(row, column, leftValue);
-
-    float value = std::max(leftValue, topValue);
     char char1 = this->seq1[row - 1];
     char char2 = this->seq2[column - 1];
-    value = std::max(value, SWArray.get(row - 1, column - 1) + this->score.get(char1, char2));
+    float topLeftValue = SWArray.get(row - 1, column - 1) + this->score.get(char1, char2);
+
+    float value = 0;
+    Directions dir = Directions::NONE;
+
+    if (topValue > value) {
+        value = topValue;
+        dir = Directions::TOP;
+    }
+    if (leftValue > value) {
+        value = leftValue;
+        dir = Directions::LEFT;
+    }
+    if (topLeftValue > value) {
+        value = topLeftValue;
+        dir = Directions::TOP_LEFT;
+    }
+
     this->SWArray.set(row, column, value);
+    this->directions.set(row, column, dir);
+
+    if (value > this->maxValue) {
+        this->maxValue = value;
+        this->maxCoords.first = row;
+        this->maxCoords.second = column;
+    }
+}
+
+std::pair<std::string, std::string> SWAlignment::_backPropagation() {
+    std::string stringOne = "", stringTwo = "";
+    Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second);
+    std::size_t row = this->maxCoords.first,
+            column = this->maxCoords.second;
+    while (dir != Directions::NONE) {
+        char char1 = this->seq1[row - 1],
+                char2 = this->seq2[column - 1];
+        switch (dir) {
+            case Directions::LEFT :
+                stringOne = "-" + stringOne;
+                stringTwo = char2 + stringTwo;
+                column--;
+                break;
+            case Directions::TOP :
+                stringOne = char1 + stringOne;
+                stringTwo = "-" + stringTwo;
+                row--;
+                break;
+            case Directions::TOP_LEFT :
+                stringOne = char1 + stringOne;
+                stringTwo = char2 + stringTwo;
+                column--;
+                row--;
+                break;
+        }
+        dir = this->directions.get(row, column);
+    }
+    return std::make_pair(stringOne, stringTwo);
 }
 

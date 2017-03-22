@@ -4,8 +4,8 @@
 #include "ScoreMatrix.h"
 
 int main(int argc, char** argv) {
-    std::string first = "kazak";
-    std::string second = "barakz";
+    std::string first = "kazaksouloK";
+    std::string second = "kazaoulo";
     ScoreMatrix score(first + second);
     for (std::size_t row = 0; row < score.numRows; row++) {
         for (std::size_t column = 0; column < score.numColumns; column++) {
@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     }
 
     SWAlignment align = SWAlignment(score);
-    align.align(first, second);
-
+    auto res = align.align(first, second);
+    std::cout << res.first << std::endl << res.second << std::endl;
     return 0;
 }

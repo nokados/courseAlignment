@@ -12,7 +12,7 @@ ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
     chars.insert(text.begin(), text.end());
     this->alphabet = std::vector<char>(chars.begin(), chars.end());
     unsigned long alphabetSize = this->alphabet.size();
-    this->resize(alphabetSize, alphabetSize);
+    this->resize(alphabetSize, alphabetSize, 0);
     for (size_t index = 0; index < alphabetSize; index++) {
         this->alphabetIndexes.insert(std::make_pair(alphabet[index], index));
     }

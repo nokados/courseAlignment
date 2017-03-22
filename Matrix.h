@@ -30,8 +30,8 @@ public:
         this->data[row * numColumns + column] = value;
     }
 
-    void resize(std::size_t numRows, std::size_t numColumns) {
-        this->data.resize(numRows * numColumns, 0);
+    void resize(std::size_t numRows, std::size_t numColumns, T defaultValue) {
+        this->data.resize(numRows * numColumns, defaultValue);
         this->numRows = numRows;
         this->numColumns = numColumns;
     }

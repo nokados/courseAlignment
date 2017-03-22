@@ -4,6 +4,8 @@
 
 #include "ScoreMatrix.h"
 #include <set>
+#include <iostream>
+
 
 ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
     std::set<char> chars;
@@ -16,7 +18,7 @@ ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
     }
 }
 
-int ScoreMatrix::get(char first, char second) {
+float ScoreMatrix::get(char first, char second) {
     size_t firstIndex = this->alphabetIndexes[first];
     size_t secondIndex = this->alphabetIndexes[second];
     return Matrix::get(firstIndex, secondIndex);

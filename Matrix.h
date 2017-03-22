@@ -6,6 +6,8 @@
 #define ONEANOTHERALIGNMENT_MATRIX_H
 
 #include <vector>
+#include <string>
+#include <sstream>
 
 template<typename T>
 class Matrix {
@@ -32,6 +34,14 @@ public:
         this->data.resize(numRows * numColumns, 0);
         this->numRows = numRows;
         this->numColumns = numColumns;
+    }
+
+    std::string toString() {
+        std::ostringstream res;
+        for (size_t i = 0; i < this->data.size(); i++) {
+            res << this->data[i] << (((i + 1) % this->numColumns > 0) ? "\t" : "\n");
+        }
+        return res.str();
     }
 };
 

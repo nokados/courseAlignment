@@ -7,10 +7,10 @@
 #include <iostream>
 
 
-ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
-    std::set<char> chars;
+ScoreMatrix::ScoreMatrix(std::wstring text) : Matrix() {
+    std::set<wchar_t> chars;
     chars.insert(text.begin(), text.end());
-    this->alphabet = std::vector<char>(chars.begin(), chars.end());
+    this->alphabet = std::vector<wchar_t>(chars.begin(), chars.end());
     unsigned long alphabetSize = this->alphabet.size();
     this->resize(alphabetSize, alphabetSize, 0);
     for (size_t index = 0; index < alphabetSize; index++) {
@@ -18,8 +18,18 @@ ScoreMatrix::ScoreMatrix(std::string text) : Matrix() {
     }
 }
 
-float ScoreMatrix::get(char first, char second) {
+float ScoreMatrix::get(wchar_t first, wchar_t second) {
     size_t firstIndex = this->alphabetIndexes[first];
     size_t secondIndex = this->alphabetIndexes[second];
     return Matrix::get(firstIndex, secondIndex);
+}
+
+ScoreMatrix::ScoreMatrix() {}
+
+void ScoreMatrix::addChar(wchar_t newChar, float matchWeight, float diffWeight) {
+    this->alphabet.push_back(newChar);
+    unsigned long alphabetSize = this->alphabet.size();
+    this->alphabetIndexes.insert(std::make_pair(alphabet[alphabetSize-1], alphabetSize-1));
+    this->resize(alphabetSize, alphabetSize, diffWeight);
+    this->set(alphabetSize - 1, alphabetSize - 1, matchWeight);
 }

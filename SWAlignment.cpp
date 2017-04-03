@@ -8,8 +8,8 @@
 SWAlignment::SWAlignment(ScoreMatrix score, float gap) : score(score), gap(gap) {
 }
 
-std::pair<std::string, std::string>
-SWAlignment::align(std::string firstSeq, std::string secondSeq) {
+std::pair<std::wstring, std::wstring>
+SWAlignment::align(std::wstring firstSeq, std::wstring secondSeq) {
     this->seq1 = firstSeq;
     this->seq2 = secondSeq;
     this->len1 = firstSeq.size();
@@ -40,8 +40,8 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
     float topValue = this->SWArray.get(row - 1, column) - this->gap;
     float leftValue = this->SWArray.get(row, column - 1) - this->gap;
 
-    char char1 = this->seq1[row - 1];
-    char char2 = this->seq2[column - 1];
+    wchar_t char1 = this->seq1[row - 1];
+    wchar_t char2 = this->seq2[column - 1];
     float topLeftValue = SWArray.get(row - 1, column - 1) + this->score.get(char1, char2);
 
     float value = 0;
@@ -70,23 +70,23 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
     }
 }
 
-std::pair<std::string, std::string> SWAlignment::_backPropagation() {
-    std::string stringOne = "", stringTwo = "";
+std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
+    std::wstring stringOne = L"", stringTwo = L"";
     Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second);
     std::size_t row = this->maxCoords.first,
             column = this->maxCoords.second;
     while (dir != Directions::NONE) {
-        char char1 = this->seq1[row - 1],
+        wchar_t char1 = this->seq1[row - 1],
                 char2 = this->seq2[column - 1];
         switch (dir) {
             case Directions::LEFT :
-                stringOne = "-" + stringOne;
+                stringOne = L"-" + stringOne;
                 stringTwo = char2 + stringTwo;
                 column--;
                 break;
             case Directions::TOP :
                 stringOne = char1 + stringOne;
-                stringTwo = "-" + stringTwo;
+                stringTwo = L"-" + stringTwo;
                 row--;
                 break;
             case Directions::TOP_LEFT :

@@ -1,11 +1,16 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include "SWAlignment.h"
 #include "ScoreMatrix.h"
+#include "FileManager.h"
+
+std::string getTextFromFile(const char* file) ;
 
 int main(int argc, char** argv) {
-    std::string first = "kazaksouloK";
-    std::string second = "kazaoulo";
+    std::wstring first = L"kazaksouloKK";
+    std::wstring second = L"kazaoulo";
     ScoreMatrix score(first + second);
     for (std::size_t row = 0; row < score.numRows; row++) {
         for (std::size_t column = 0; column < score.numColumns; column++) {
@@ -15,6 +20,10 @@ int main(int argc, char** argv) {
 
     SWAlignment align = SWAlignment(score);
     auto res = align.align(first, second);
-    std::cout << res.first << std::endl << res.second << std::endl;
+    std::wcout << res.first << std::endl << res.second << std::endl;
+
+    FileManager fm("CPPKeywords.ini");
+    std::wcout << fm.loadCode("main.cpp");
+
     return 0;
 }

@@ -13,11 +13,27 @@
 
 class ScoreMatrix : public Matrix<float> {
 private:
-    std::vector<char> alphabet;
-    std::map<char, std::size_t> alphabetIndexes;
+    /**
+     * Список всех символов текста
+     */
+    std::vector<wchar_t> alphabet;
+    /**
+     * Какой индекс имеет символ в списке alphabet
+     */
+    std::map<wchar_t, std::size_t> alphabetIndexes;
 public:
-    ScoreMatrix(std::string text);
-    float get(char first, char second);
+    ScoreMatrix();
+    ScoreMatrix(std::wstring text);
+    float get(wchar_t first, wchar_t second);
+    /**
+     * Добавляет новый символ в алфавит.
+     * Матрица score для него будет равна matchWeight на диагонале
+     * и diffWeight в других ячейках
+     * @param newChar
+     * @param matchWeight
+     * @param diffWeight
+     */
+    void addChar(wchar_t newChar, float matchWeight = 1, float diffWeight = -1);
 };
 
 

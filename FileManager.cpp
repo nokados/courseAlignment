@@ -53,7 +53,7 @@ std::wstring FileManager::_replaceKeywordsWithUnicode(std::wstring text) {
     std::basic_regex<wchar_t> spaces(L"\\s+");
     text = std::regex_replace(text, spaces, L" ");
 
-    for(auto it = this->unicodeToKeywords.begin(); it != this->unicodeToKeywords.end(); it++) {
+    for(auto it = this->unicodeToKeywords.cbegin(); it != this->unicodeToKeywords.cend(); it++) {
         wchar_t unicodeChar = it->first;
         std::wstring rawPattern = it->second;
         // Escape special symbols in pattern
@@ -67,6 +67,10 @@ std::wstring FileManager::_replaceKeywordsWithUnicode(std::wstring text) {
     }
 
     return text;
+}
+
+ScoreMatrix* FileManager::getScore() {
+    return &this->score;
 }
 
 

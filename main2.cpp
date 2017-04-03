@@ -6,13 +6,14 @@
 #include "ScoreMatrix.h"
 #include "FileManager.h"
 
+std::string getTextFromFile(const char* file) ;
+
 int main(int argc, char** argv) {
     FileManager fm("CPPKeywords.ini");
     std::wstring first = fm.loadCode("main.cpp");
     std::wstring second = fm.loadCode("main2.cpp");
 
     ScoreMatrix score(first + second);
-    score.merge(fm.getScore());
     for (std::size_t row = 0; row < score.numRows; row++) {
         for (std::size_t column = 0; column < score.numColumns; column++) {
             score.set(row, column, row == column);

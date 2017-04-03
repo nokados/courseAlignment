@@ -34,6 +34,13 @@ public:
      * @param diffWeight
      */
     void addChar(wchar_t newChar, float matchWeight = 1, float diffWeight = -1);
+    /**
+     * Перезаписывает совпадающие ключи новыми значениями
+     * @param score
+     */
+    void merge(ScoreMatrix* anotherScore);
+
+    bool has(wchar_t ch);
 };
 
 

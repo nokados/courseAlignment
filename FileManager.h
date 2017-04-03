@@ -23,6 +23,7 @@ public:
      */
     FileManager(const char* keywordsFile);
     std::wstring loadCode(const char *file);
+    ScoreMatrix* getScore();
 private:
     std::wstring _getTextFromFile(const char *file);
     /**

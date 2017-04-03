@@ -33,3 +33,17 @@ void ScoreMatrix::addChar(wchar_t newChar, float matchWeight, float diffWeight) 
     this->resize(alphabetSize, alphabetSize, diffWeight);
     this->set(alphabetSize - 1, alphabetSize - 1, matchWeight);
 }
+
+void ScoreMatrix::merge(ScoreMatrix *anotherScore) {
+    for (auto it = this->alphabet.begin(); it != this->alphabet.end(); it++) {
+        if (anotherScore->has(*it)) {
+            std::size_t index = this->alphabetIndexes[*it];
+            // Только диагональные элементы
+            this->set(index, index, anotherScore->get(*it, *it));
+        }
+    }
+}
+
+bool ScoreMatrix::has(wchar_t ch) {
+    return this->alphabetIndexes.find(ch) != this->alphabetIndexes.end();
+}

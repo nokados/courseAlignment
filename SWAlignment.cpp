@@ -72,7 +72,7 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
 
 std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
     std::wstring stringOne = L"", stringTwo = L"";
-    Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second);
+    Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second); //todo вывод если макскоордс не в правом нижнем углу
     std::size_t row = this->maxCoords.first,
             column = this->maxCoords.second;
     while (dir != Directions::NONE) {

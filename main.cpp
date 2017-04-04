@@ -12,12 +12,12 @@ int main(int argc, char** argv) {
     std::wstring second = fm.loadCode("main2.cpp");
 
     ScoreMatrix score(first + second);
-    score.merge(fm.getScore());
     for (std::size_t row = 0; row < score.numRows; row++) {
         for (std::size_t column = 0; column < score.numColumns; column++) {
             score.set(row, column, row == column);
         }
     }
+    score.merge(fm.getScore());
 
     SWAlignment align = SWAlignment(score);
     auto res = align.align(first, second);

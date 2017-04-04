@@ -49,11 +49,60 @@ FileManager::FileManager(const char *keywordsFile) : score() {
     in.close();
 }
 
+
+ScoreMatrix *FileManager::getScore() {
+    return &this->score;
+}
+
+void FileManager::printAlignedStrings(std::wstring firstText, std::wstring secondText) {
+    for (std::size_t firstIt = 0; firstIt < firstText.length(); firstIt++) {
+        wchar_t secondChar = (secondText.length() > firstIt) ? secondText[firstIt] : L'-';
+        std::wcout << this->_getOriginalSubstring(firstText[firstIt], secondChar);
+    }
+    std::wcout << std::endl;
+    for (std::size_t secondIt = 0; secondIt < firstText.length(); secondIt++) {
+        wchar_t firstChar = (firstText.length() > secondIt) ? firstText[secondIt] : L'-';
+        std::wcout << this->_getOriginalSubstring(secondText[secondIt], firstChar);
+    }
+    std::wcout << std::endl;
+}
+
+std::wstring FileManager::_getOriginalSubstring(wchar_t firstChar, wchar_t secondChar) {
+    bool isFirstUnicode = this->unicodeToKeywords.find(firstChar) != this->unicodeToKeywords.end();
+    bool isSecondUnicode = this->unicodeToKeywords.find(secondChar) != this->unicodeToKeywords.end();
+    if(!isFirstUnicode && !isSecondUnicode) {
+        std::wstring res;
+        res.push_back(firstChar);
+        return res;
+    }
+    if (isFirstUnicode && !isSecondUnicode) {
+        return this->unicodeToKeywords[firstChar];
+    }
+    if (!isFirstUnicode && isSecondUnicode) {
+        std::wstring res,
+            secondStr = this->unicodeToKeywords[secondChar];
+        res.push_back(firstChar);
+        for (std::size_t i = 1; i < secondStr.length(); i++) {
+            res.push_back(L'-');
+        }
+        return res;
+    }
+    if (isFirstUnicode && isSecondUnicode) {
+        std::wstring firstStr = this->unicodeToKeywords[firstChar],
+            secondStr = this->unicodeToKeywords[secondChar];
+        for (std::size_t i = firstStr.length(); i < secondStr.length(); i++) {
+            firstStr.push_back(L'-');
+        }
+        return firstStr;
+    }
+}
+
+
 std::wstring FileManager::_replaceKeywordsWithUnicode(std::wstring text) {
     std::basic_regex<wchar_t> spaces(L"\\s+");
     text = std::regex_replace(text, spaces, L" ");
 
-    for(auto it = this->unicodeToKeywords.cbegin(); it != this->unicodeToKeywords.cend(); it++) {
+    for (auto it = this->unicodeToKeywords.cbegin(); it != this->unicodeToKeywords.cend(); it++) {
         wchar_t unicodeChar = it->first;
         std::wstring rawPattern = it->second;
         // Escape special symbols in pattern
@@ -68,9 +117,4 @@ std::wstring FileManager::_replaceKeywordsWithUnicode(std::wstring text) {
 
     return text;
 }
-
-ScoreMatrix* FileManager::getScore() {
-    return &this->score;
-}
-
 

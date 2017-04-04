@@ -24,6 +24,7 @@ public:
     FileManager(const char* keywordsFile);
     std::wstring loadCode(const char *file);
     ScoreMatrix* getScore();
+    void printAlignedStrings(std::wstring firstText, std::wstring secondText);
 private:
     std::wstring _getTextFromFile(const char *file);
     /**
@@ -34,7 +35,7 @@ private:
      * @return отформатированную строку
      */
     std::wstring _replaceKeywordsWithUnicode(std::wstring text);
-
+    std::wstring _getOriginalSubstring(wchar_t firstChar, wchar_t secondChar);
 };
 
 

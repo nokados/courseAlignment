@@ -39,7 +39,6 @@ private:
     void _forwardPropagation();
     void _updateCellValue(size_t row, size_t column);
     std::pair<std::wstring, std::wstring> _backPropagation();
-
 };
 
 

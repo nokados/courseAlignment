@@ -21,7 +21,6 @@ int main(int argc, char** argv) {
 
     SWAlignment align = SWAlignment(score);
     auto res = align.align(first, second);
-    std::wcout << res.first << std::endl << res.second << std::endl;
-
+    fm.printAlignedStrings(res.first, res.second);
     return 0;
 }

@@ -11,6 +11,7 @@
 
 const wchar_t UNICODE_RESERVE_FIRST = L'\uE000';
 const wchar_t UNICODE_RESERVE_LAST = L'\uF8FF';
+
 class FileManager {
 private:
     std::map<wchar_t, std::wstring> unicodeToKeywords;
@@ -21,12 +22,17 @@ public:
      * В score записываются веса для ключевых слов из файла.
      * @param keywordsFile
      */
-    FileManager(const char* keywordsFile);
+    FileManager(const char *keywordsFile);
+
     std::wstring loadCode(const char *file);
-    ScoreMatrix* getScore();
+
+    ScoreMatrix *getScore();
+
     void printAlignedStrings(std::wstring firstText, std::wstring secondText);
+
 private:
     std::wstring _getTextFromFile(const char *file);
+
     /**
      * Заменяет ключевые слова на соответствующие им символы из Unicode
      * Также заменяет все пробельные символы на один пробел
@@ -35,6 +41,7 @@ private:
      * @return отформатированную строку
      */
     std::wstring _replaceKeywordsWithUnicode(std::wstring text);
+
     std::wstring _getOriginalSubstring(wchar_t firstChar, wchar_t secondChar);
 };
 

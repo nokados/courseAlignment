@@ -26,13 +26,21 @@ void SWAlignment::_createSWArray() {
 }
 
 void SWAlignment::_forwardPropagation() {
-    this->maxValue = 0;
-    this->maxCoords.first = 0;
-    this->maxCoords.second = 0;
     for (size_t row = 1; row <= this->len1; row++) {
         for (size_t column = 1; column <= this->len2; column++) {
             this->_updateCellValue(row, column);
         }
+    }
+    std::cout << SWArray.toString() << std::endl;
+    this->maxValue = this->SWArray.get(this->len1, this->len2);
+    this->maxCoords.first = this->len1;
+    this->maxCoords.second = this->len2;
+
+    for (size_t column = 1; column < this->len2; column++) {
+        this->_updateMaxValue(this->len1, column);
+    }
+    for (size_t row = 1; row < this->len1; row++) {
+        this->_updateMaxValue(row, this->len2);
     }
 }
 
@@ -62,8 +70,11 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
 
     this->SWArray.set(row, column, value);
     this->directions.set(row, column, dir);
+}
 
-    if (value > this->maxValue) {
+void SWAlignment::_updateMaxValue(size_t row, size_t column) {
+    float value = this->SWArray.get(row, column);
+    if (value > maxValue) {
         this->maxValue = value;
         this->maxCoords.first = row;
         this->maxCoords.second = column;
@@ -72,9 +83,29 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
 
 std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
     std::wstring stringOne = L"", stringTwo = L"";
-    Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second); //todo вывод если макскоордс не в правом нижнем углу
+    Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second);
     std::size_t row = this->maxCoords.first,
             column = this->maxCoords.second;
+    std::cout << this->maxValue << std::endl;
+    std::cout << this->maxCoords.first << " " << this->maxCoords.second << std::endl;
+    std::cout << this->len1 << " " << this->len2 << std::endl;
+
+    if (row < this->len1) {
+        for (std::size_t i = this->len1; i > row; i--) {
+            wchar_t char1 = this->seq1[i - 1];
+            stringOne = char1 + stringOne;
+            stringTwo = L"-" + stringTwo;
+        }
+    }
+
+    if (column < this->len2) {
+        for (std::size_t i = this->len2; i > column; i--) {
+            wchar_t char2 = this->seq2[i - 1];
+            stringTwo = char2 + stringTwo;
+            stringOne = L"-" + stringOne;
+        }
+    }
+
     while (dir != Directions::NONE) {
         wchar_t char1 = this->seq1[row - 1],
                 char2 = this->seq2[column - 1];
@@ -98,6 +129,7 @@ std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
         }
         dir = this->directions.get(row, column);
     }
+    std::wcout << stringOne << std::endl << stringTwo << std::endl;
     return std::make_pair(stringOne, stringTwo);
 }
 

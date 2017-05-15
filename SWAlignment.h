@@ -16,6 +16,9 @@ enum class Directions {
     TOP_LEFT
 };
 
+/**
+ * Smith-Waterman alignment
+ */
 class SWAlignment {
 private:
     ScoreMatrix score;
@@ -39,6 +42,14 @@ private:
     void _forwardPropagation();
     void _updateCellValue(size_t row, size_t column);
     std::pair<std::wstring, std::wstring> _backPropagation();
+
+    /**
+     * Проверяет, если значение в клетке (row, column) больше сохраненного максимального значение,
+     * то последнее перезаписывается
+     * @param row
+     * @param column
+     */
+    void _updateMaxValue(size_t row, size_t column);
 };
 
 

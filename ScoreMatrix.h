@@ -33,7 +33,7 @@ public:
      * @param matchWeight
      * @param diffWeight
      */
-    void addChar(wchar_t newChar, float matchWeight = 1, float diffWeight = -1);
+    void addChar(wchar_t newChar, float matchWeight = 1);
     /**
      * Перезаписывает совпадающие ключи новыми значениями
      * @param score

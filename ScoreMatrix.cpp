@@ -26,11 +26,10 @@ float ScoreMatrix::get(wchar_t first, wchar_t second) {
 
 ScoreMatrix::ScoreMatrix() {}
 
-void ScoreMatrix::addChar(wchar_t newChar, float matchWeight, float diffWeight) {
+void ScoreMatrix::addChar(wchar_t newChar, float matchWeight) {
     this->alphabet.push_back(newChar);
     unsigned long alphabetSize = this->alphabet.size();
     this->alphabetIndexes.insert(std::make_pair(alphabet[alphabetSize-1], alphabetSize-1));
-    this->resize(alphabetSize, alphabetSize, diffWeight);
     this->set(alphabetSize - 1, alphabetSize - 1, matchWeight);
 }
 

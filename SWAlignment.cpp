@@ -5,7 +5,8 @@
 #include "SWAlignment.h"
 #include <iostream>
 
-SWAlignment::SWAlignment(ScoreMatrix score, float gap) : score(score), gap(gap) {
+SWAlignment::SWAlignment(ScoreMatrix score, float gapOpen, float gapExtend) : score(score), gapOpen(gapOpen),
+                                                                              gapExtend(gapExtend) {
 }
 
 std::pair<std::wstring, std::wstring>
@@ -22,6 +23,8 @@ SWAlignment::align(std::wstring firstSeq, std::wstring secondSeq) {
 
 void SWAlignment::_createSWArray() {
     this->SWArray.resize(this->len1 + 1, this->len2 + 1, 0);
+    this->topGaps.resize(this->len1 + 1, this->len2 + 1, 0);
+    this->leftGaps.resize(this->len1 + 1, this->len2 + 1, 0);
     this->directions.resize(this->len1 + 1, this->len2 + 1, Directions::NONE);
 }
 
@@ -31,7 +34,6 @@ void SWAlignment::_forwardPropagation() {
             this->_updateCellValue(row, column);
         }
     }
-    std::cout << SWArray.toString() << std::endl;
     this->maxValue = this->SWArray.get(this->len1, this->len2);
     this->maxCoords.first = this->len1;
     this->maxCoords.second = this->len2;
@@ -45,15 +47,20 @@ void SWAlignment::_forwardPropagation() {
 }
 
 void SWAlignment::_updateCellValue(size_t row, size_t column) {
-    float topValue = this->SWArray.get(row - 1, column) - this->gap;
-    float leftValue = this->SWArray.get(row, column - 1) - this->gap;
-
     wchar_t char1 = this->seq1[row - 1];
     wchar_t char2 = this->seq2[column - 1];
+
+    float topValue = this->SWArray.get(row - 1, column) - this->_getGap(row, column, Directions::TOP);
+    float leftValue = this->SWArray.get(row, column - 1) - this->_getGap(row, column, Directions::LEFT);
     float topLeftValue = SWArray.get(row - 1, column - 1) + this->score.get(char1, char2);
 
     float value = 0;
     Directions dir = Directions::NONE;
+
+    if (topLeftValue > value) {
+        value = topLeftValue;
+        dir = Directions::TOP_LEFT;
+    }
 
     if (topValue > value) {
         value = topValue;
@@ -63,11 +70,14 @@ void SWAlignment::_updateCellValue(size_t row, size_t column) {
         value = leftValue;
         dir = Directions::LEFT;
     }
-    if (topLeftValue > value) {
-        value = topLeftValue;
-        dir = Directions::TOP_LEFT;
-    }
 
+
+    if (dir == Directions::TOP) {
+        this->topGaps.set(row, column, this->topGaps.get(row - 1, column) + 1);
+    }
+    if (dir == Directions::LEFT) {
+        this->topGaps.set(row, column, this->leftGaps.get(row, column - 1) + 1);
+    }
     this->SWArray.set(row, column, value);
     this->directions.set(row, column, dir);
 }
@@ -86,9 +96,6 @@ std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
     Directions dir = this->directions.get(this->maxCoords.first, this->maxCoords.second);
     std::size_t row = this->maxCoords.first,
             column = this->maxCoords.second;
-    std::cout << this->maxValue << std::endl;
-    std::cout << this->maxCoords.first << " " << this->maxCoords.second << std::endl;
-    std::cout << this->len1 << " " << this->len2 << std::endl;
 
     if (row < this->len1) {
         for (std::size_t i = this->len1; i > row; i--) {
@@ -129,7 +136,17 @@ std::pair<std::wstring, std::wstring> SWAlignment::_backPropagation() {
         }
         dir = this->directions.get(row, column);
     }
-    std::wcout << stringOne << std::endl << stringTwo << std::endl;
     return std::make_pair(stringOne, stringTwo);
+}
+
+float SWAlignment::_getGap(size_t row, size_t column, Directions dir) {
+    size_t numGaps;
+    if (dir == Directions::TOP) {
+        numGaps = this->topGaps.get(row - 1, column);
+    } else {
+        numGaps = this->leftGaps.get(row, column - 1);
+    }
+
+    return this->gapOpen + numGaps * gapExtend;
 }
 

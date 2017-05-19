@@ -6,6 +6,13 @@
 #include "ScoreMatrix.h"
 #include "FileManager.h"
 
+/**
+ * Entry
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char** argv) {
     FileManager fm("CPPKeywords.ini");
     std::wstring first = fm.loadCode("main.cpp");

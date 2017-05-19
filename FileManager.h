@@ -15,7 +15,10 @@ const wchar_t UNICODE_RESERVE_LAST = L'\uF8FF';
 class FileManager {
 private:
     std::map<wchar_t, std::wstring> unicodeToKeywords;
+    std::map<wchar_t, std::wstring> hidedText;
     ScoreMatrix score;
+    wchar_t lastUnicode;
+
 public:
     /**
      * Инициализирует матрицу перевода ключего слова в символы unicode.
@@ -43,6 +46,14 @@ private:
     std::wstring _replaceKeywordsWithUnicode(std::wstring text);
 
     std::wstring _getOriginalSubstring(wchar_t firstChar, wchar_t secondChar);
+
+    std::wstring _hideText(std::wstring basic_string);
+
+    std::wstring _hideQuote(std::wstring basic_string, wchar_t i, size_t i1);
+
+    std::wstring restoreHiddenText(std::wstring basic_string);
+
+    wchar_t getLastUnicode();
 };
 
 

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <regex>
+#include <string>
 
 std::wstring FileManager::_getTextFromFile(const char *file) {
     std::wifstream in(file, std::ios::in);
@@ -37,14 +38,12 @@ FileManager::FileManager(const char *keywordsFile) : score() {
     }
     std::wstring pattern;
     float weight;
-    wchar_t unicodeChar = UNICODE_RESERVE_FIRST;
+    this->lastUnicode = UNICODE_RESERVE_FIRST;
+
     while (in >> pattern >> weight) {
+        wchar_t unicodeChar = this->getLastUnicode();
         this->score.addChar(unicodeChar, weight);
         this->unicodeToKeywords.insert(std::make_pair(unicodeChar, pattern));
-        unicodeChar++;
-        if (unicodeChar > UNICODE_RESERVE_LAST) {
-            throw "Not enough reserved Unicode characters";
-        }
     }
     in.close();
 }
@@ -70,7 +69,7 @@ void FileManager::printAlignedStrings(std::wstring firstText, std::wstring secon
 std::wstring FileManager::_getOriginalSubstring(wchar_t firstChar, wchar_t secondChar) {
     bool isFirstUnicode = this->unicodeToKeywords.find(firstChar) != this->unicodeToKeywords.end();
     bool isSecondUnicode = this->unicodeToKeywords.find(secondChar) != this->unicodeToKeywords.end();
-    if(!isFirstUnicode && !isSecondUnicode) {
+    if (!isFirstUnicode && !isSecondUnicode) {
         std::wstring res;
         res.push_back(firstChar);
         return res;
@@ -80,7 +79,7 @@ std::wstring FileManager::_getOriginalSubstring(wchar_t firstChar, wchar_t secon
     }
     if (!isFirstUnicode) { // && isSecondUnicode
         std::wstring res,
-            secondStr = this->unicodeToKeywords[secondChar];
+                secondStr = this->unicodeToKeywords[secondChar];
         res.push_back(firstChar);
         for (std::size_t i = 1; i < secondStr.length(); i++) {
             res.push_back(L'-');
@@ -89,32 +88,101 @@ std::wstring FileManager::_getOriginalSubstring(wchar_t firstChar, wchar_t secon
     }
 //    if (isFirstUnicode && isSecondUnicode) {
     std::wstring firstStr = this->unicodeToKeywords[firstChar],
-        secondStr = this->unicodeToKeywords[secondChar];
+            secondStr = this->unicodeToKeywords[secondChar];
     for (std::size_t i = firstStr.length(); i < secondStr.length(); i++) {
         firstStr.push_back(L'-');
     }
     return firstStr;
-
 }
 
 
 std::wstring FileManager::_replaceKeywordsWithUnicode(std::wstring text) {
     std::basic_regex<wchar_t> spaces(L"\\s+");
     text = std::regex_replace(text, spaces, L" ");
-
+    text = this->_hideText(text);
     for (auto it = this->unicodeToKeywords.cbegin(); it != this->unicodeToKeywords.cend(); it++) {
         wchar_t unicodeChar = it->first;
         std::wstring rawPattern = it->second;
         // Escape special symbols in pattern
         const std::basic_regex<wchar_t> esc(L"(\\^|\\[|\\]|\\.|\\$|\\{|\\}|\\*|\\(|\\)|\\\\|\\+|\\||\\?|\\<|\\>)");
-        std::wstring escapedPattern = std::regex_replace(rawPattern, esc, L"\\$1");
+        std::wstring escapedPattern = L"\\b" + std::regex_replace(rawPattern, esc, L"\\$1") + L"\\B";
         // Replace pattern with Unicode characters
         std::basic_regex<wchar_t> pattern(escapedPattern);
         std::wstring replace;
         replace.push_back(unicodeChar);
         text = std::regex_replace(text, pattern, replace);
     }
-
+    text = restoreHiddenText(text);
     return text;
+}
+
+std::wstring FileManager::_hideText(std::wstring fullText) {
+    for (std::size_t pos = 0; pos < fullText.length(); pos++) {
+        if (fullText[pos] == L'\'') {
+            fullText = this->_hideQuote(fullText, L'\'', pos);
+            pos+=2;
+        }
+        else if (fullText[pos] == L'"') {
+            fullText = this->_hideQuote(fullText, L'"', pos);
+            pos+=2;
+        }
+        else if ((fullText[pos] == L'/') && ((pos + 1) < fullText.length())) {
+            if (fullText[pos + 1] == L'/') {
+                size_t secondPos = fullText.find(L'\n', pos + 2);
+                fullText.erase(pos, secondPos - pos);
+            } else if (fullText[pos + 1] == L'*') {
+                size_t secondPos = fullText.find(L"*/", pos + 2);
+                fullText.erase(pos, secondPos - pos + 2);
+            }
+        }
+    }
+    return fullText;
+}
+
+
+std::wstring FileManager::_hideQuote(std::wstring text, wchar_t symbol, size_t pos) {
+    bool secondIsEscaped = true;
+    size_t secondPos = pos;
+    while (secondIsEscaped) {
+        secondPos = text.find(symbol, secondPos + 1);
+        if (secondPos == std::string::npos) {
+            throw ("Не закрытая кавычка");
+        }
+        // Check escaping
+        size_t numSlashes = 0,
+                slashPos = secondPos - 1;
+        while (text[slashPos] == L'\\') {
+            numSlashes++;
+            slashPos--; // Дойдет до pos, где заведомо стоит кавычка
+        }
+        secondIsEscaped = (numSlashes % 2) == 1;
+    }
+    wchar_t unicodeLabel = this->getLastUnicode();
+    std::wstring erased = text.substr(pos + 1, secondPos - pos - 1);
+    text.erase(pos + 1, secondPos - pos - 1);
+    text.insert(pos+1, 1, unicodeLabel);
+    this->hidedText.insert(std::make_pair(unicodeLabel, erased));
+    return text;
+}
+
+std::wstring FileManager::restoreHiddenText(std::wstring text) {
+    for (auto it = this->hidedText.cbegin(); it != this->hidedText.cend(); it++) {
+        wchar_t unicodeChar = it->first;
+        std::wstring restoredString = it->second;
+        std::wstring repPattern;
+        repPattern.push_back(unicodeChar);
+        std::basic_regex<wchar_t> pattern(repPattern);
+        text = std::regex_replace(text, pattern, restoredString);
+    }
+    return text;
+}
+
+wchar_t FileManager::getLastUnicode() {
+    if (lastUnicode > UNICODE_RESERVE_LAST) {
+        throw "Not enough reserved Unicode characters";
+    }
+    wchar_t unicodeChar = lastUnicode;
+    lastUnicode++;
+    return unicodeChar;
 }
 

@@ -14,9 +14,15 @@
  * @return
  */
 int main(int argc, char **argv) {
-    FileManager fm("CPPKeywords.ini");
-    std::wstring first = fm.loadCode("/home/nokados/ClionProjects/courseAlignment/oC4vwCiSulo9v6Ma/c.arguments.process-args-1/41-000324-Алиев_Магомед-20161217151017.c");
-    std::wstring second = fm.loadCode("/home/nokados/ClionProjects/courseAlignment/oC4vwCiSulo9v6Ma/c.arguments.process-args-1/41-000298-Потехин_Сергей-20161210130728.c");
+    std::ios::sync_with_stdio(false);
+    std::locale loc("en_US.UTF-8"); // You can also use "" for the default system locale
+    std::wcout.imbue(loc); // Use it for output
+
+    FileManager fm("/home/nokados/ClionProjects/courseAlignment/CPPKeywords.ini", loc);
+    char* firstFile = argv[1];
+    char* secondFile = argv[2];
+    std::wstring first = fm.loadCode(firstFile);
+    std::wstring second = fm.loadCode(secondFile);
 
     ScoreMatrix score(first + second);
     for (std::size_t row = 0; row < score.numRows; row++) {

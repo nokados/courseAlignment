@@ -12,6 +12,7 @@
 
 std::wstring FileManager::_getTextFromFile(const char *file) {
     std::wifstream in(file, std::ios::in);
+    in.imbue(this->loc);
     if (in) {
         std::wstring text;
         in.seekg(0, std::ios::end);
@@ -31,8 +32,9 @@ std::wstring FileManager::loadCode(const char *file) {
     return text;
 }
 
-FileManager::FileManager(const char *keywordsFile) : score() {
+FileManager::FileManager(const char *keywordsFile, std::locale loc) : score(), loc(loc) {
     std::wifstream in(keywordsFile, std::ios::in);
+    in.imbue(loc);
     if (!in) {
         perror("File error");
         throw (errno);

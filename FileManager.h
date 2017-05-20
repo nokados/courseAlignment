@@ -18,14 +18,14 @@ private:
     std::map<wchar_t, std::wstring> hidedText;
     ScoreMatrix score;
     wchar_t lastUnicode;
-
+    std::locale loc;
 public:
     /**
      * Инициализирует матрицу перевода ключего слова в символы unicode.
      * В score записываются веса для ключевых слов из файла.
      * @param keywordsFile
      */
-    FileManager(const char *keywordsFile);
+    FileManager(const char *keywordsFile, std::locale loc);
 
     std::wstring loadCode(const char *file);
 

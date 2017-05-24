@@ -200,6 +200,7 @@ std::wstring FileManager::restoreHiddenText(std::wstring text) {
         std::basic_regex<wchar_t> pattern(repPattern);
         text = std::regex_replace(text, pattern, restoredString);
     }
+    hidedText.clear();
     return text;
 }
 
